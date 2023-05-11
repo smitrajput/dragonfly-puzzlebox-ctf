@@ -3,7 +3,7 @@ pragma solidity ^0.8.19;
 
 import "forge-std/Test.sol";
 import "../src/PuzzleBox.sol";
-import "../src/PuzzleBoxSolution.sol";
+import "../src/CleanPuzzleBoxSolution.sol";
 
 contract PuzzleBoxFixture is Test {
     event Lock(bytes4 selector, bool isLocked);
@@ -18,12 +18,12 @@ contract PuzzleBoxFixture is Test {
 
     PuzzleBoxFactory _factory = new PuzzleBoxFactory();
     PuzzleBox _puzzle;
-    PuzzleBoxSolution _solution;
+    CleanPuzzleBoxSolution _solution;
 
     // Use a modifier instead of setUp() to keep it all in one tx.
     modifier initEnv() {
         _puzzle = _factory.createPuzzleBox{value: 1337}();
-        _solution = PuzzleBoxSolution(address(new SolutionContainer(type(PuzzleBoxSolution).runtimeCode)));
+        _solution = CleanPuzzleBoxSolution(address(new SolutionContainer(type(CleanPuzzleBoxSolution).runtimeCode)));
         _;
     }
 
@@ -31,6 +31,7 @@ contract PuzzleBoxFixture is Test {
         // Uncomment to verify a complete solution.
         // vm.expectEmit(false, false, false, false, address(_puzzle));
         // emit Open(address(0));
+        // console.log("PUZZZZZLE", address(_puzzle));
         _solution.solve(_puzzle);
     }
 }
