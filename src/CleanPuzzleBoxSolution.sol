@@ -7,6 +7,7 @@ contract CleanPuzzleBoxSolution {
 
     function solve(PuzzleBox puzzle) external {
         // How close can you get to opening the box?
+
         Operate operate = new Operate(puzzle);
         operate.callDrip();
 
@@ -18,27 +19,27 @@ contract CleanPuzzleBoxSolution {
         puzzle.creep{gas: 98000}();
 
         uint256[] memory n = new uint256[](6);
-        n[0] = 2;
-        n[1] = 4;
-        n[2] = 6;
-        n[3] = 7;
-        n[4] = 8;
-        n[5] = 9;
+        assembly {
+            mstore(add(n, 0x20), 2)
+            mstore(add(n, 0x40), 4)
+            mstore(add(n, 0x60), 6)
+            mstore(add(n, 0x80), 7)
+            mstore(add(n, 0xa0), 8)
+            mstore(add(n, 0xc0), 9)
+        }
         bytes memory encodedDripIds = abi.encode(n);
 
         address(puzzle).call(abi.encodePacked(
                             puzzle.torch.selector, uint256(0x01), uint8(0), encodedDripIds));
-        // require(z);
 
         address payable[] memory friends = new address payable[](1);
-        friends[0] = payable(0x416e59DaCfDb5D457304115bBFb9089531D873B7);
         uint256[] memory friendsCutBps = new uint256[](3);
-        // uint160(bytes20(0xC817dD2a5daA8f790677e399170c92AabD044b57))
-        // 0xC817dD2a5daA8f790677e399170c92AabD044b57 -> not implicitly convertible to uint256, but
-        // 0x00C817dD2a5daA8f790677e399170c92AabD044b57 is. Strange.
-        friendsCutBps[0] = 0x00C817dD2a5daA8f790677e399170c92AabD044b57;
-        friendsCutBps[1] = 150;
-        friendsCutBps[2] = 75;
+        assembly {
+            mstore(add(friends, 0x20), 0x416e59DaCfDb5D457304115bBFb9089531D873B7)
+            mstore(add(friendsCutBps, 0x20), 0x00C817dD2a5daA8f790677e399170c92AabD044b57)
+            mstore(add(friendsCutBps, 0x40), 150)
+            mstore(add(friendsCutBps, 0x60), 75)
+        }
 
         puzzle.spread(friends, friendsCutBps);
 
@@ -48,7 +49,13 @@ contract CleanPuzzleBoxSolution {
         // = 71301600283128936764672812745529451294904726341347593422192209434084996057698
         uint256 s = 71301600283128936764672812745529451294904726341347593422192209434084996057698;
         uint8 v = 27;
+        //= abi.encodePacked(nonce, s, v);
         bytes memory sign = abi.encodePacked(nonce, s, v);
+        // assembly {
+        //     mstore(add(sign, 0x20), nonce)
+        //     mstore(add(sign, 0x40), s)
+        //     mstore(add(sign, 0x60), v)
+        // }
         puzzle.open(nonce, sign);
     }
 }
@@ -81,3 +88,26 @@ contract Operate {
         }
     }
 }
+
+        // friends[0] = payable(0x416e59DaCfDb5D457304115bBFb9089531D873B7);
+        // uint160(bytes20(0xC817dD2a5daA8f790677e399170c92AabD044b57))
+        // 0xC817dD2a5daA8f790677e399170c92AabD044b57 -> not implicitly convertible to uint256, but
+        // 0x00C817dD2a5daA8f790677e399170c92AabD044b57 is. Strange.
+        // friendsCutBps[0] = 0x00C817dD2a5daA8f790677e399170c92AabD044b57;
+        // friendsCutBps[1] = 150;
+        // friendsCutBps[2] = 75;
+
+        // address sol = solution;
+        // bytes4 fnSig = hex"19ae45e4";
+        // assembly {
+        //     mstore(0x00, fnSig)
+        //     switch eq(selfbalance(), 337)
+        //     case 0 {
+        //         pop(
+        //             call(gas(), caller(), 101, 0x00, 4, 0x20, 0x20)
+        //         )
+        //     }
+        //     case 1 {
+        //         selfdestruct(sol)
+        //     }
+        // }
