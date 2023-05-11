@@ -92,6 +92,7 @@ contract PuzzleBox {
     }
 
     modifier maxCallDataSize(uint256 maxBytes) {
+        console.log('msg.data.length', msg.data.length);
         require(msg.data.length <= maxBytes, 'call data too large');
         _;
     }

