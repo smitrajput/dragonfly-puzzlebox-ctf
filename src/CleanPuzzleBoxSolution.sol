@@ -1,13 +1,16 @@
 pragma solidity ^0.8.19;
 
 import "./PuzzleBox.sol";
+import "forge-std/Test.sol";
 
-contract CleanPuzzleBoxSolution {
+
+contract CleanPuzzleBoxSolution is Test {
     // uint256 constant S_THRESHOLD = 0xfffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364141;
 
     function solve(PuzzleBox puzzle) external {
         // How close can you get to opening the box?
 
+        // vm.breakpoint("a");
         Operate operate = new Operate(puzzle);
         operate.callDrip();
 

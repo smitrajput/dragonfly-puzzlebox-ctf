@@ -32,6 +32,7 @@ contract PuzzleBoxFixture is Test {
         // vm.expectEmit(false, false, false, false, address(_puzzle));
         // emit Open(address(0));
         // console.log("PUZZZZZLE", address(_puzzle));
+        // vm.breakpoint("b");
         _solution.solve(_puzzle);
     }
 }
