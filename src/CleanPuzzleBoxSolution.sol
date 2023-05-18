@@ -12,11 +12,15 @@ contract CleanPuzzleBoxSolution is Test {
 
         // vm.breakpoint("a");
         Operate operate = new Operate(puzzle);
-        operate.callDrip();
+        address(operate).call("");
 
+        // add puzzle.leakCount to access set (i.e. make it warm)
         puzzle.leak();
         // address(uint160(address(puzzle)) + uint160(2)) = 0x037EDA3AdB1198021A9B2e88C22B464Fd38DB3f5
-        payable(address(uint160(address(puzzle)) + uint160(2))).transfer(1);
+        // add puzzle + 2 to access set (i.e. make it warm) AND avoid the 25k value_to_empty_account_cost gas on calling zip()
+        unchecked {
+            payable(address(uint160(address(puzzle)) + uint160(2))).transfer(1);
+        }
         puzzle.zip();
 
         puzzle.creep{gas: 98000}();
@@ -32,8 +36,10 @@ contract CleanPuzzleBoxSolution is Test {
         }
         bytes memory encodedDripIds = abi.encode(n);
 
+        // TODO: need to understand this calldata encoding scheme
         address(puzzle).call(abi.encodePacked(
                             puzzle.torch.selector, uint256(0x01), uint8(0), encodedDripIds));
+
 
         address payable[] memory friends = new address payable[](1);
         uint256[] memory friendsCutBps = new uint256[](3);
@@ -60,12 +66,17 @@ contract CleanPuzzleBoxSolution is Test {
         //     mstore(add(sign, 0x60), v)
         // }
         puzzle.open(nonce, sign);
+
+        // NOTE: this costs 6k less gas
+        // puzzle.open(0xc8f549a7e4cb7e1c60d908cc05ceff53ad731e6ea0736edf7ffeea588dfb42d8,
+        // (
+        //     hex"c8f549a7e4cb7e1c60d908cc05ceff53ad731e6ea0736edf7ffeea588dfb42d8"
+        //     hex"9da3468f3d897010503caed5c52689b959fbac09ff6879275a8279feffcc8a62"
+        //     hex"1b"
+        // ));
     }
 }
 
-interface IPBProxy {
-    function lock(bytes4, bool) external;
-}
 
 contract Operate {
     PuzzleBox immutable puzzle;
@@ -76,16 +87,18 @@ contract Operate {
         puzzle.operate();
         // bytes4(keccak256("torch(bytes)") = 0x41c0e1a1
         // puzzle.torch.selector
-        IPBProxy(address(puzzle)).lock(puzzle.torch.selector, false);
+        PuzzleBoxProxy(payable(address(puzzle))).lock(puzzle.torch.selector, false);
     }
 
-    function callDrip() external {
-        puzzle.drip{value: 101}();
-    }
+    // function callDrip() external {
+    //     puzzle.drip{value: 101}();
+    // }
 
-    receive() external payable {
+    fallback() external payable {
         if(address(this).balance != 337) {
-            puzzle.drip{value: 101}();
+            address(puzzle).call{value:101}(hex"9f678cca");
+            // puzzle.drip{value: 101}();
+            // console.logBytes4(bytes4(keccak256("drip()"))); //0x9f678cca
         } else {
             selfdestruct(payable(solution));
         }

@@ -80,7 +80,6 @@ contract PuzzleBoxSolution is Test {
         // bytes32 r = 0xc8f549a7e4cb7e1c60d908cc05ceff53ad731e6ea0736edf7ffeea588dfb42d8;
         // bytes32 s_ = 0x625cb970c2768fefafc3512a3ad9764560b330dcafe02714654fe48dd069b6df;
         // bytes32 s = threshold - s_;
-
         console.logBytes32(bytes32(s));
         uint8 v = 27;
         bytes memory sign = abi.encodePacked(r, s, v);
