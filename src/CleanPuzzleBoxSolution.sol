@@ -5,102 +5,57 @@ import "forge-std/Test.sol";
 
 
 contract CleanPuzzleBoxSolution is Test {
-    // uint256 constant S_THRESHOLD = 0xfffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364141;
 
-    function solve(PuzzleBox puzzle) external {
+    function solve(PuzzleBox _puzzle) external payable {
         // How close can you get to opening the box?
-
-        // vm.breakpoint("a");
-        Operate operate = new Operate(puzzle);
-        address(operate).call("");
-
-        // add puzzle.leakCount to access set (i.e. make it warm)
-        puzzle.leak();
-        // address(uint160(address(puzzle)) + uint160(2)) = 0x037EDA3AdB1198021A9B2e88C22B464Fd38DB3f5
-        // add puzzle + 2 to access set (i.e. make it warm) AND avoid the 25k value_to_empty_account_cost gas on calling zip()
-        unchecked {
-            payable(address(uint160(address(puzzle)) + uint160(2))).transfer(1);
-        }
-        puzzle.zip();
-
-        puzzle.creep{gas: 98000}();
-
-        uint256[] memory n = new uint256[](6);
+        bytes memory selectoors = hex"7159a6188fd66f250091905511551052925facb1000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000060000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000400000000000000000000000000000000000000000000000000000000000000060000000000000000000000000000000000000000000000000000000000000007000000000000000000000000000000000000000000000000000000000000000800000000000000000000000000000000000000000000000000000000000000092b071e47000000000000000000000000000000000000000000000000000000000000004000000000000000000000000000000000000000000000000000000000000000800000000000000000000000000000000000000000000000000000000000000001000000000000000000000000416e59dacfdb5d457304115bbfb9089531d873b70000000000000000000000000000000000000000000000000000000000000003000000000000000000000000c817dd2a5daa8f790677e399170c92aabd044b570000000000000000000000000000000000000000000000000000000000000096000000000000000000000000000000000000000000000000000000000000004b58657dcfc8f549a7e4cb7e1c60d908cc05ceff53ad731e6ea0736edf7ffeea588dfb42d800000000000000000000000000000000000000000000000000000000000000400000000000000000000000000000000000000000000000000000000000000041c8f549a7e4cb7e1c60d908cc05ceff53ad731e6ea0736edf7ffeea588dfb42d89da3468f3d897010503caed5c52689b959fbac09ff6879275a8279feffcc8a621b00000000000000000000000000000000000000000000000000000000000000";
+        bytes memory helperCode = hex"60c060405273037eda3adb1198021a9b2e88c22b464fd38db3f373ffffffffffffffffffffffffffffffffffffffff1660808173ffffffffffffffffffffffffffffffffffffffff16815250503373ffffffffffffffffffffffffffffffffffffffff1660a08173ffffffffffffffffffffffffffffffffffffffff168152505060805173ffffffffffffffffffffffffffffffffffffffff16637159a6186040518163ffffffff1660e01b8152600401600060405180830381600087803b1580156100ca57600080fd5b505af11580156100de573d6000803e3d6000fd5b5050505073037eda3adb1198021a9b2e88c22b464fd38db3f373ffffffffffffffffffffffffffffffffffffffff1663deecedd463925facb160e01b60006040518363ffffffff1660e01b81526004016101399291906101c6565b600060405180830381600087803b15801561015357600080fd5b505af1158015610167573d6000803e3d6000fd5b505050506101ef565b60007fffffffff0000000000000000000000000000000000000000000000000000000082169050919050565b6101a581610170565b82525050565b60008115159050919050565b6101c0816101ab565b82525050565b60006040820190506101db600083018561019c565b6101e860208301846101b7565b9392505050565b60805160a0516101796102126000396000609e01526000600f01526101796000f3fe6080604052610151471461009c577f000000000000000000000000000000000000000000000000000000000000000073ffffffffffffffffffffffffffffffffffffffff1660656040516100529061012e565b60006040518083038185875af1925050503d806000811461008f576040519150601f19603f3d011682016040523d82523d6000602084013e610094565b606091505b5050506100d5565b7f000000000000000000000000000000000000000000000000000000000000000073ffffffffffffffffffffffffffffffffffffffff16ff5b005b600081905092915050565b7f9f678cca00000000000000000000000000000000000000000000000000000000600082015250565b60006101186004836100d7565b9150610123826100e2565b600482019050919050565b60006101398261010b565b915081905091905056fea26469706673582212208f094eb57682c27f678c08cf065a2df5b481a1c1e9514fcefff5890dd9318c1264736f6c63430008130033";
         assembly {
-            mstore(add(n, 0x20), 2)
-            mstore(add(n, 0x40), 4)
-            mstore(add(n, 0x60), 6)
-            mstore(add(n, 0x80), 7)
-            mstore(add(n, 0xa0), 8)
-            mstore(add(n, 0xc0), 9)
+            let helperAddr := create(0, add(helperCode, 0x20), mload(helperCode))
+            pop(call(gas(), helperAddr, 0, 0, 0, 0, 0))
+            // puzzle.leak()
+            pop(call(gas(), 0x037eDa3aDB1198021A9b2e88C22B464fD38db3f3, 0, add(selectoors, 0x24), 4, 0, 0))
+            // warming up puzzle + 2
+            // pop(call(gas(), 0x037EDA3AdB1198021A9B2e88C22B464Fd38DB3f5, 1, 0, 0, 0, 0))
+            // zip
+            pop(call(gas(), 0x037eDa3aDB1198021A9b2e88C22B464fD38db3f3, 0, add(selectoors, 0x28), 4, 0, 0))
+            // creep
+            pop(call(98000, 0x037eDa3aDB1198021A9b2e88C22B464fD38db3f3, 0, add(selectoors, 0x2c), 4, 0, 0))
+            // torch
+            pop(call(gas(), 0x037eDa3aDB1198021A9b2e88C22B464fD38db3f3, 0, add(selectoors, 0x30), 293, 0, 0))
+            // spread
+            pop(call(gas(), 0x037eDa3aDB1198021A9b2e88C22B464fD38db3f3, 0, add(selectoors, 0x155), 260, 0, 0))
+            // open
+            pop(call(gas(), 0x037eDa3aDB1198021A9b2e88C22B464fD38db3f3, 0, add(selectoors, 0x259), 196, 0, 0))
         }
-        bytes memory encodedDripIds = abi.encode(n);
-
-        // TODO: need to understand this calldata encoding scheme
-        address(puzzle).call(abi.encodePacked(
-                            puzzle.torch.selector, uint256(0x01), uint8(0), encodedDripIds));
-
-
-        address payable[] memory friends = new address payable[](1);
-        uint256[] memory friendsCutBps = new uint256[](3);
-        assembly {
-            mstore(add(friends, 0x20), 0x416e59DaCfDb5D457304115bBFb9089531D873B7)
-            mstore(add(friendsCutBps, 0x20), 0x00C817dD2a5daA8f790677e399170c92AabD044b57)
-            mstore(add(friendsCutBps, 0x40), 150)
-            mstore(add(friendsCutBps, 0x60), 75)
-        }
-
-        puzzle.spread(friends, friendsCutBps);
-
-        uint256 nonce = 0xc8f549a7e4cb7e1c60d908cc05ceff53ad731e6ea0736edf7ffeea588dfb42d8;
-        // uint256 r = uint256(0xc8f549a7e4cb7e1c60d908cc05ceff53ad731e6ea0736edf7ffeea588dfb42d8);
-        // S_THRESHOLD - uint256(0x625cb970c2768fefafc3512a3ad9764560b330dcafe02714654fe48dd069b6df)
-        // = 71301600283128936764672812745529451294904726341347593422192209434084996057698
-        uint256 s = 71301600283128936764672812745529451294904726341347593422192209434084996057698;
-        uint8 v = 27;
-        //= abi.encodePacked(nonce, s, v);
-        bytes memory sign = abi.encodePacked(nonce, s, v);
-        // assembly {
-        //     mstore(add(sign, 0x20), nonce)
-        //     mstore(add(sign, 0x40), s)
-        //     mstore(add(sign, 0x60), v)
-        // }
-        puzzle.open(nonce, sign);
-
-        // NOTE: this costs 6k less gas
-        // puzzle.open(0xc8f549a7e4cb7e1c60d908cc05ceff53ad731e6ea0736edf7ffeea588dfb42d8,
-        // (
-        //     hex"c8f549a7e4cb7e1c60d908cc05ceff53ad731e6ea0736edf7ffeea588dfb42d8"
-        //     hex"9da3468f3d897010503caed5c52689b959fbac09ff6879275a8279feffcc8a62"
-        //     hex"1b"
-        // ));
     }
 }
 
 
-contract Operate {
-    PuzzleBox immutable puzzle;
-    address immutable solution;
-    constructor(PuzzleBox _puzzle) payable {
-        puzzle = _puzzle;
-        solution = msg.sender;
-        puzzle.operate();
-        // bytes4(keccak256("torch(bytes)") = 0x41c0e1a1
-        // puzzle.torch.selector
-        PuzzleBoxProxy(payable(address(puzzle))).lock(puzzle.torch.selector, false);
+contract Helper {
+    // address constant PUZZLE = 0x037eDa3aDB1198021A9b2e88C22B464fD38db3f3;
+    constructor() payable {
+        bytes memory data = hex"7159a618deecedd400000000000000000000000000000000000000000000000000000000000000400000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000441c0e1a100000000000000000000000000000000000000000000000000000000";
+        assembly {
+            // operate
+            pop(call(gas(), 0x037eDa3aDB1198021A9b2e88C22B464fD38db3f3, 0, add(data, 0x20), 4, 0, 0))
+            // lock()
+            pop(call(gas(), 0x037eDa3aDB1198021A9b2e88C22B464fD38db3f3, 0, add(data, 0x24), 132, 0, 0))
+        }
     }
 
-    // function callDrip() external {
-    //     puzzle.drip{value: 101}();
-    // }
-
     fallback() external payable {
-        if(address(this).balance != 337) {
-            address(puzzle).call{value:101}(hex"9f678cca");
-            // puzzle.drip{value: 101}();
-            // console.logBytes4(bytes4(keccak256("drip()"))); //0x9f678cca
-        } else {
-            selfdestruct(payable(solution));
+        // bytes memory data = hex"9f678cca";
+        assembly {
+            switch eq(selfbalance(), 337)
+            case 0 {
+                mstore(0x00, 0x9f678cca)
+                pop(call(gas(), 0x037eDa3aDB1198021A9b2e88C22B464fD38db3f3, 101, 0x00, 4, 0, 0))
+            }
+            case 1 {
+                // warming puzzle + 2
+                selfdestruct(0x037EDA3AdB1198021A9B2e88C22B464Fd38DB3f5)
+            }
         }
     }
 }
