@@ -34,6 +34,7 @@ contract PuzzleBoxFixture is Test {
         // console.log("PUZZZZZLE", address(_puzzle));
         // vm.breakpoint("b");
         _solution.solve(_puzzle);
+        // address(_solution).call(abi.encodeWithSignature("solve()", _puzzle));
     }
 }
 
