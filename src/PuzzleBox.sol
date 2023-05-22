@@ -92,7 +92,7 @@ contract PuzzleBox {
     }
 
     modifier maxCallDataSize(uint256 maxBytes) {
-        console.log('msg.data.length', msg.data.length);
+        // console.log('msg.data.length', msg.data.length);
         require(msg.data.length <= maxBytes, 'call data too large');
         _;
     }
@@ -212,7 +212,7 @@ contract PuzzleBox {
         maxCallDataSize(300)
     {
         uint256[] memory dripIds = abi.decode(encodedDripIds, (uint256[]));
-        console.log('torch', dripIds.length);
+        // console.log('torch', dripIds.length);
         for (uint256 i; i < dripIds.length; ++i) {
             _burnDrip(dripIds[i]);
         }

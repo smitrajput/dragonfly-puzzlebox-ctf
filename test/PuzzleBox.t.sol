@@ -33,7 +33,9 @@ contract PuzzleBoxFixture is Test {
         // emit Open(address(0));
         // console.log("PUZZZZZLE", address(_puzzle));
         // vm.breakpoint("b");
+        uint256 gas = gasleft();
         _solution.solve(_puzzle);
+        console.log("GAS USED", gas - gasleft());
         // address(_solution).call(abi.encodeWithSignature("solve()", _puzzle));
     }
 }
