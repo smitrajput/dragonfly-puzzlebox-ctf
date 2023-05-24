@@ -19,9 +19,13 @@ contract PuzzleBoxFixture is Test {
     PuzzleBoxFactory _factory = new PuzzleBoxFactory();
     PuzzleBox _puzzle;
     CleanPuzzleBoxSolution _solution;
+    // address deployer;
 
     // Use a modifier instead of setUp() to keep it all in one tx.
     modifier initEnv() {
+        // deployer = vm.addr(0xcc7ec7a48ef9945cd647aa5c01a0dc8967612dd70c0a24f7bfb53e29a04f04fe);
+        // vm.deal(deployer, 1 ether);
+        // vm.startPrank(deployer);
         _puzzle = _factory.createPuzzleBox{value: 1337}();
         _solution = CleanPuzzleBoxSolution(address(new SolutionContainer(type(CleanPuzzleBoxSolution).runtimeCode)));
         _;

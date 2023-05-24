@@ -309,7 +309,7 @@ contract PuzzleBox {
 }
 
 // Contract for instantiating puzzleboxes.
-contract PuzzleBoxFactory {
+contract PuzzleBoxFactory is Test {
     PuzzleBox public immutable logic = new PuzzleBox();
 
     function createPuzzleBox()
@@ -318,8 +318,9 @@ contract PuzzleBoxFactory {
         returns (PuzzleBox puzzle)
     {
         PuzzleBoxProxy proxy = new PuzzleBoxProxy(logic);
+        vm.etch(0x69209d8a7d258515eC9a4D25F7Be1dB85cB1B826, address(proxy).code);
         proxy.lock(PuzzleBox.torch.selector, true);
-        puzzle = PuzzleBox(payable(proxy));
+        puzzle = PuzzleBox(0x69209d8a7d258515eC9a4D25F7Be1dB85cB1B826);
         {
             address payable[] memory friends = new address payable[](2);
             uint256[] memory friendsCutBps = new uint256[](friends.length);
