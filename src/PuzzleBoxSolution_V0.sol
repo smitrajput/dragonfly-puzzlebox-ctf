@@ -3,7 +3,9 @@ pragma solidity ^0.8.19;
 import "./PuzzleBox.sol";
 import "forge-std/Test.sol";
 
-contract PuzzleBoxSolution is Test {
+/// Basic solution (sans gas-optimizations)
+/// Reference: https://gist.github.com/merklejerk/0f97d94a752c32edea0c01f464d0db97
+contract PuzzleBoxSolution_V0 is Test {
     function solve(PuzzleBox puzzle) external {
         // How close can you get to opening the box?
 

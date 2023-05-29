@@ -3,7 +3,7 @@ pragma solidity ^0.8.19;
 
 import "forge-std/Test.sol";
 import "../src/PuzzleBox.sol";
-import "../src/CleanPuzzleBoxSolution.sol";
+import "../src/PuzzleBoxSolution_V2.sol";
 
 contract PuzzleBoxFixture is Test {
     event Lock(bytes4 selector, bool isLocked);
@@ -18,7 +18,7 @@ contract PuzzleBoxFixture is Test {
 
     PuzzleBoxFactory _factory = new PuzzleBoxFactory();
     PuzzleBox _puzzle;
-    CleanPuzzleBoxSolution _solution;
+    PuzzleBoxSolution_V2 _solution;
     // address deployer;
 
     // Use a modifier instead of setUp() to keep it all in one tx.
@@ -27,7 +27,7 @@ contract PuzzleBoxFixture is Test {
         // vm.deal(deployer, 1 ether);
         // vm.startPrank(deployer);
         _puzzle = _factory.createPuzzleBox{value: 1337}();
-        _solution = CleanPuzzleBoxSolution(address(new SolutionContainer(type(CleanPuzzleBoxSolution).runtimeCode)));
+        _solution = PuzzleBoxSolution_V2(address(new SolutionContainer(type(PuzzleBoxSolution_V2).runtimeCode)));
         _;
     }
 
@@ -35,12 +35,10 @@ contract PuzzleBoxFixture is Test {
         // Uncomment to verify a complete solution.
         // vm.expectEmit(false, false, false, false, address(_puzzle));
         // emit Open(address(0));
-        // console.log("PUZZZZZLE", address(_puzzle));
         // vm.breakpoint("b");
         uint256 gas = gasleft();
         _solution.solve(_puzzle);
         console.log("GAS USED", gas - gasleft());
-        // address(_solution).call(abi.encodeWithSignature("solve()", _puzzle));
     }
 }
 

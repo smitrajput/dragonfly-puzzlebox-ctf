@@ -3,6 +3,7 @@ pragma solidity ^0.8.19;
 import "./PuzzleBox.sol";
 
 /// This is the solution that put me to #6 on the (live) leaderboard: https://ctf.dragonfly.xyz/scores
+/// Reference: https://www.kalos.xyz/blog/dragonfly-ctf-puzzlebox-sol
 contract PuzzleBoxSolution_V1 {
 
     fallback() external payable {
@@ -24,25 +25,32 @@ contract PuzzleBoxSolution_V1 {
         assembly {
             let helperAddr := create(0, add(helperCode, 0x20), mload(helperCode))
             pop(call(gas(), helperAddr, 0, 0, 0, 0, 0))
-            // puzzle.leak()
+
+            // leak()
             pop(call(gas(), 0x69209d8a7d258515eC9a4D25F7Be1dB85cB1B826, 0, add(selectoors, 0x24), 4, 0, 0))
+
             // warming up puzzle + 2 // not needed now as it's been done in Helper's fallback
             // pop(call(gas(), add(_puzzle, 2), 1, 0, 0, 0, 0))
-            // zip
+
+            // zip()
             pop(call(gas(), 0x69209d8a7d258515eC9a4D25F7Be1dB85cB1B826, 0, add(selectoors, 0x28), 4, 0, 0))
-            // creep
+
+            // creep()
             pop(call(98000, 0x69209d8a7d258515eC9a4D25F7Be1dB85cB1B826, 0, add(selectoors, 0x2c), 4, 0, 0))
-            // torch
+
+            // torch()
             pop(call(gas(), 0x69209d8a7d258515eC9a4D25F7Be1dB85cB1B826, 0, add(selectoors, 0x30), 293, 0, 0))
-            // spread
+
+            // spread()
             pop(call(gas(), 0x69209d8a7d258515eC9a4D25F7Be1dB85cB1B826, 0, add(selectoors, 0x155), 260, 0, 0))
-            // open
+
+            // open()
             pop(call(gas(), 0x69209d8a7d258515eC9a4D25F7Be1dB85cB1B826, 0, add(selectoors, 0x259), 196, 0, 0))
         }
     }
 }
 
-/* Commeted-out Helper contract, as its deployment bytecode is hardcoded above, to save gas */
+/* Commented-out Helper contract, as its deployment bytecode is hardcoded above, to save gas */
 
 // contract Helper {
 //     constructor() payable {
