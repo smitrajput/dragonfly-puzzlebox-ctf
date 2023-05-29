@@ -6,7 +6,8 @@ import "forge-std/Test.sol";
 /// This solution further optimizes PuzzleBoxSolution_V1 using codecopy() to copy the 
 /// encoded function selectors + Helper contract bytecode from environment code to memory, 
 /// to avoid 'add(selectoors, specificSelectorOffset)' opcodes during calls to zip, creep, torch, spread, open.
-/// Replaing '0' with 'callvalue()' further saves 1 gas as PUSH1 0x00 is 3 gas, while CALLVALUE is 2 gas.
+/// Replaing '0' with 'callvalue()' further saves 1 gas as 'PUSH1 0x00' is 3 gas, while CALLVALUE is 2 gas.
+/// Reference: https://www.kalos.xyz/blog/dragonfly-ctf-puzzlebox-sol
 contract PuzzleBoxSolution_V2 {
 
     function solve(PuzzleBox _puzzle) external payable {
