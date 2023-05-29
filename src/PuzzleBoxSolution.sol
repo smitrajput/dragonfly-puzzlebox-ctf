@@ -7,40 +7,16 @@ contract PuzzleBoxSolution is Test {
     function solve(PuzzleBox puzzle) external {
         // How close can you get to opening the box?
 
-        console.log('lastDripId', puzzle.lastDripId());
-        console.log('puzzle eth', address(puzzle).balance);
-
         Operate operate = new Operate(puzzle, address(this));
 
-        console.log('operate', address(operate));
-        console.log('Operate eth', address(operate).balance);
-
-        console.log('puzzle', address(puzzle));
-        console.log('puzzle.operator()', puzzle.operator());
-        console.log('puzzle eth', address(puzzle).balance);
-
         operate.callDrip();
-        console.log('Operate eth', address(operate).balance);
-        console.log('Puzzle eth', address(puzzle).balance);
-        console.log('Solution eth', address(this).balance);
-        console.log('puzzle.operator()', puzzle.operator());
-        console.log('new lastDripId', puzzle.lastDripId());
-        console.log('dripCount', puzzle.dripCount());
-        // for(uint256 i = 0; i <= 10; i++) {
-        //     console.log('isValidDripId %s', i, puzzle.isValidDripId(i));
-        // }
 
         puzzle.leak();
         payable(address(uint160(address(puzzle)) + uint160(2))).transfer(1);
         puzzle.zip();
-        console.log('isValidDripId %s', 1, puzzle.isValidDripId(1));
 
         puzzle.creep{gas: 98000}();
-        console.log('isValidDripId %s', 10, puzzle.isValidDripId(10));
 
-
-        // uint256[] memory dripIds = new uint256[];
-        // bytes memory encodedDripIds = abi.encode([1, 2]);//, 4, 6, 7, 8, 9
         uint256[] memory inputArray = new uint256[](6);
         inputArray[0] = 2;
         inputArray[1] = 4;
@@ -48,13 +24,10 @@ contract PuzzleBoxSolution is Test {
         inputArray[3] = 7;
         inputArray[4] = 8;
         inputArray[5] = 9;
-        // inputArray[6] = 9;
         bytes memory encodedDripIds = abi.encode(inputArray);
-        console.log('encodedDripIdsLength', encodedDripIds.length);
-        // puzzle.torch(encodedDripIds);
+
         (bool success,) = address(puzzle).call(abi.encodePacked(
                             puzzle.torch.selector, uint256(0x01), uint8(0), encodedDripIds));
-        // (bool success,) = address(puzzle).call(abi.encodeWithSignature("torch(bytes)", encodedDripIds));
         require(success, "call failed");
 
         address payable[] memory friends = new address payable[](1);
@@ -65,22 +38,12 @@ contract PuzzleBoxSolution is Test {
         friendsCutBps[2] = 0.0075e4;
 
         puzzle.spread(friends, friendsCutBps);
-        console.log('isValidDripId %s', 3, puzzle.isValidDripId(3));
-        console.log('Puzzle eth', address(puzzle).balance);
-
-        console.log('admin', puzzle.admin());
 
         uint256 SECP256k1N = 0xfffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364141;
         uint256 nonce = 0xc8f549a7e4cb7e1c60d908cc05ceff53ad731e6ea0736edf7ffeea588dfb42d8;
         uint256 r = uint256(0xc8f549a7e4cb7e1c60d908cc05ceff53ad731e6ea0736edf7ffeea588dfb42d8);
         uint256 s = SECP256k1N - uint256(0x625cb970c2768fefafc3512a3ad9764560b330dcafe02714654fe48dd069b6df);
 
-        // bytes32 threshold = 0xfffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364141;
-        // uint256 nonce = 0xc8f549a7e4cb7e1c60d908cc05ceff53ad731e6ea0736edf7ffeea588dfb42d8;
-        // bytes32 r = 0xc8f549a7e4cb7e1c60d908cc05ceff53ad731e6ea0736edf7ffeea588dfb42d8;
-        // bytes32 s_ = 0x625cb970c2768fefafc3512a3ad9764560b330dcafe02714654fe48dd069b6df;
-        // bytes32 s = threshold - s_;
-        console.logBytes32(bytes32(s));
         uint8 v = 27;
         bytes memory sign = abi.encodePacked(r, s, v);
         puzzle.open(nonce, sign);
