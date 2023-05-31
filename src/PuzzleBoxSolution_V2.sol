@@ -26,7 +26,8 @@ contract PuzzleBoxSolution_V2 {
             // copy encoded selectors + Helper contract bytecode from environment code (at 'garage' below) to memory, to avoid 'add(selectoors, specificSelectorOffset)' opcodes for 
             // calls to zip, creep, torch, spread, open
             // codecopy(0x20, 469, 1020)
-            codecopy(0x20, 155, 1063)
+            // codecopy(0x20, 509, 1020)
+            codecopy(0x20, 477, 1020)
 
             // test call to log calldata at 0x320
             // pop(call(gas(), 0x69209d8a7d258515eC9a4D25F7Be1dB85cB1B826, callvalue(), 0x320, 252, callvalue(), callvalue()))
