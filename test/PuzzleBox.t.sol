@@ -3,7 +3,7 @@ pragma solidity ^0.8.19;
 
 import "forge-std/Test.sol";
 import "../src/PuzzleBox.sol";
-import "../src/PuzzleBoxSolution_V2.sol";
+import "../src/PuzzleBoxSolution_V0.sol";
 
 contract PuzzleBoxFixture is Test {
     event Lock(bytes4 selector, bool isLocked);
@@ -18,7 +18,7 @@ contract PuzzleBoxFixture is Test {
 
     PuzzleBoxFactory _factory = new PuzzleBoxFactory();
     PuzzleBox _puzzle;
-    PuzzleBoxSolution_V2 _solution;
+    PuzzleBoxSolution_V0 _solution;
     // address deployer;
 
     // Use a modifier instead of setUp() to keep it all in one tx.
@@ -27,7 +27,7 @@ contract PuzzleBoxFixture is Test {
         // vm.deal(deployer, 1 ether);
         // vm.startPrank(deployer);
         _puzzle = _factory.createPuzzleBox{value: 1337}();
-        _solution = PuzzleBoxSolution_V2(address(new SolutionContainer(type(PuzzleBoxSolution_V2).runtimeCode)));
+        _solution = PuzzleBoxSolution_V0(address(new SolutionContainer(type(PuzzleBoxSolution_V0).runtimeCode)));
         _;
     }
 

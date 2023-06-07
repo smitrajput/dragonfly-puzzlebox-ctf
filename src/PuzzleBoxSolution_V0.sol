@@ -27,10 +27,17 @@ contract PuzzleBoxSolution_V0 is Test {
         inputArray[4] = 8;
         inputArray[5] = 9;
         bytes memory encodedDripIds = abi.encode(inputArray);
+        console.logBytes(encodedDripIds);
+
+        // 0x20 6 2 4 6 7 8 9
+        // 0x20 0x100 0x20 6 2 4 6 7 8 9
+
+        // (bool success,) = address(puzzle).call(abi.encodeWithSelector(puzzle.torch.selector, encodedDripIds));
+        // require(success, "call failed");
 
         (bool success,) = address(puzzle).call(abi.encodePacked(
                             puzzle.torch.selector, uint256(0x01), uint8(0), encodedDripIds));
-        require(success, "call failed");
+        require(success, "call failed");        
 
         address payable[] memory friends = new address payable[](1);
         uint256[] memory friendsCutBps = new uint256[](3);
